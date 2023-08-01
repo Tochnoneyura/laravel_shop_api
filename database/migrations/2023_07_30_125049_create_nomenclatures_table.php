@@ -20,7 +20,7 @@ class CreateNomenclaturesTable extends Migration
             $table->string('fullname');
             $table->string('set_number', 25);
             $table->string('brand_guid', 36)->references('guid')->on('brands');
-            $table->float('price', 15,2)->nullable();
+            $table->float('price', 15, 2)->nullable();
             $table->timestamps();
         });
     }

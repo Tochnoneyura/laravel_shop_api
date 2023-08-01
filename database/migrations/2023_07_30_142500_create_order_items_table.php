@@ -15,10 +15,10 @@ class CreateOrderItemsTable extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->integer('order_id')->references('id')->on('orders');
-            $table->float('amount',15,3);
+            $table->float('amount', 15, 3);
             $table->string('nomenclature_guid',36)->references('guid')->on('nomenclatures');
-            $table->float('price',15,2)->nullable();
-            $table->float('discount',5,2)->nullable();
+            $table->float('price', 15, 2)->nullable();
+            $table->float('discount', 5, 2)->nullable();
             $table->timestamps();
         });
     }

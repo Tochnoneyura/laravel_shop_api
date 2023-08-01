@@ -13,7 +13,7 @@ class nomenclatureRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,13 @@ class nomenclatureRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'guid' => ['required', 'max:36', 'string', 'unique:nomenclatures,guid'],
+            'code' => ['required', 'max:1', 'string', 'unique:nomenclatures,code'],
+            'name' => ['required', 'max:100', 'string'],
+            'full_name' => ['required', 'string'],
+            'set_number' => ['required', 'max:25', 'string'],
+            'brand_guid' => ['required', 'exists:brands,guid'],
+            'price' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

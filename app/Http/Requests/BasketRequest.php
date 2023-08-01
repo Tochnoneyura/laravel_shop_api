@@ -13,7 +13,7 @@ class BasketRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,9 @@ class BasketRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'created_by' => ['required', 'exist:users,id'],
+            'nomenclature_guid' => ['required', 'exist:nomenclatures,guid'],
+            'amount' => ['nullable', 'numeric'],
         ];
     }
 }

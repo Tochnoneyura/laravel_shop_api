@@ -13,7 +13,7 @@ class BrandRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,10 @@ class BrandRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'guid' => ['required', 'max:36', 'string', 'unique:brands,guid'],
+            'name' => ['required', 'max:25', 'string', 'unique:brands,name'],
+            'main_brand_guid' => ['max:36', 'string', 'nullable'],
+
         ];
     }
 }

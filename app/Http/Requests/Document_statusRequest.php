@@ -13,7 +13,7 @@ class Document_statusRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,8 @@ class Document_statusRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'guid' => ['required', 'string', 'max:36', 'unique:document_statuses,guid'],
+            'name' => ['required', 'string', 'max:50'],
         ];
     }
 }

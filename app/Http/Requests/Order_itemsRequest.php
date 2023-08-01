@@ -13,7 +13,7 @@ class Order_itemsRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,11 @@ class Order_itemsRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+           'order_id' => ['required', 'exists:orders,id'],
+           'amount' => ['required', 'numeric', 'min:1'],
+           'nomenclature_guid' => ['required', 'exists:nomenclatures,guid'],
+           'price' => ['required', 'numeric', 'min:0'],
+           'discount' => ['nullable', 'numeric'],
         ];
     }
 }
