@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -64,14 +67,6 @@ class AuthController extends Controller
     {
         return $this->respondWithToken(auth()->refresh());  //почему так? ставил как в документации
     }
-
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     protected function respondWithToken($token)
     {
         return response()->json([
@@ -80,4 +75,22 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60  // тот же вопрос
         ]);
     }
+
+    public function create(UserRequest $request)
+    {
+        $data = $request->validated();
+
+
+        User::create([
+            'email' => $data['email'],
+            'name' => $data['name'],
+            'password' => Hash::make($data['password']),
+            'active' => 'Y',
+            'last_name' => $data['last_name'],
+            'second_name' => $data['second_name'],
+            'role' => 'customer',
+            'last_login' => now(),
+        ]);
+    }
+
 }
