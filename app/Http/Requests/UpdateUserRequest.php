@@ -24,10 +24,10 @@ class UserRequest extends FormRequest
     public function rules()
     {
         return [
-            'password' => ['required', 'max:50', 'string'],
+            'password' => ['max:50', 'string'],
             'active' => ['in:Y,N,'],
-            'name' => ['required', 'max:50', 'string'],
-            'last_name' => ['required', 'max:50', 'string'],
+            'name' => ['max:50', 'string'],
+            'last_name' => ['max:50', 'string'],
             'second_name' => ['max:50', 'string', 'nullable'],
             'email' => ['required', 'max:255', 'email', 'unique:users,email'],
             'last_login' => ['date'],

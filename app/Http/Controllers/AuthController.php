@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -32,7 +33,13 @@ class AuthController extends Controller
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+        
+        $user = Auth::user();
 
+        $user->update([
+            'last_login' => now(),
+        ]);
+        
         return $this->respondWithToken($token);
     }
 
@@ -65,35 +72,14 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());  //почему так? ставил как в документации
+        return $this->respondWithToken(auth()->refresh());
     }
     protected function respondWithToken($token)
     {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60  // тот же вопрос
+            'expires_in' => auth()->factory()->getTTL() * 60
         ]);
     }
-
-    public function create(UserRequest $request)
-    {
-        $data = $request->validated();
-
-
-        User::create([
-            'email' => $data['email'],
-            'name' => $data['name'],
-            'password' => Hash::make($data['password']),
-            'active' => 'Y',
-            'last_name' => $data['last_name'],
-            'second_name' => $data['second_name'],
-            'role' => 'customer',
-            'last_login' => now(),
-        ]);
-        return('ok');
-    }
-
-    
-
 }

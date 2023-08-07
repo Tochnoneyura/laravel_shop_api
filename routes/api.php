@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,18 +28,32 @@ Route::group([
 ], function ($router) {
 
     Route::post('/login', [AuthController::class, 'login'])->name('api.auth.login');
+    Route::post('/register', [UserController::class, 'create'])->name('api.auth.register');
 
 });
 
 Route::group([
 
-    'middleware' => ['api', 'auth.custom'],
-    'prefix' => 'auth'
+    'middleware' => 'jwt.auth',
 
 ], function ($router) {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
     Route::post('/refresh', [AuthController::class, 'refresh'])->name('api.auth.refresh');
     Route::post('/me', [AuthController::class, 'me'])->name('api.auth.me');
+    
+    
 
+});
+
+Route::group([
+
+    'middleware' => 'jwt.auth',
+    'prefix' => 'users'
+
+], function ($router) {
+
+    Route::get('/',[UserController::class, 'show'])->name('api.users');
+    Route::post('/update/{id}', [UserController::class, 'update'])->name('api.users.update');
+    Route::post('/delete/{id}', [UserController::class, 'delete'])->name('api.users.delete');
 });
