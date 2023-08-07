@@ -17,7 +17,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'logout', 'refresh', 'me', 'respondWithToken']]);
+        $this->middleware('auth:api', ['except' => ['login', 'logout', 'refresh', 'me', 'respondWithToken', 'create']]);
     }
 
     /**
@@ -91,6 +91,9 @@ class AuthController extends Controller
             'role' => 'customer',
             'last_login' => now(),
         ]);
+        return('ok');
     }
+
+    
 
 }
