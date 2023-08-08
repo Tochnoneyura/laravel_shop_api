@@ -2,26 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\UpdateUserRequest;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function show()
+    public function index()
     {
         $user = Auth::user();
-
-        if( $user['role'] === 'admin') {
 
             $users = User::all();
             dd($users);
 
             return response(['message' => 'ok', 200]);
-        }
-
-        return response(['message' => 'not allowed']);
         
     }
 
@@ -48,7 +45,7 @@ class UserController extends Controller
         
     }
 
-     public function update($id, UpdateUserRequest $request)
+     public function update(UpdateUserRequest $request, $id)
     {   
         $user = User::findOrFail($id);
         $currentUser =Auth::user();
@@ -57,25 +54,24 @@ class UserController extends Controller
         switch(true) {
 
             case(($id !== $currentUser['id']) AND ($currentUser['role'] !== 'admin')):
-                return response(['message' => 'not allowed']);
+                return response()->json(['error' => 'Admin check failed'], 401);
             
             case(($id === $currentUser['id']) AND ($currentUser['role'] === 'customer')):
-                $user->update([
-                    'password' =>  Hash::make($data['password']),
-                    'name' => $data['name'],
-                    'last_name' => $data['last_name'],
-                    'second_name' => $data['second_name'],
-                ]);
+                    $user->password =  Hash::make($data['password']);
+                    $user->name = $data['name'];
+                    $user->last_name = $data['last_name'];
+                    $user->second_name = $data['second_name'];
+                    $user->save();
+
                 return response(['message' => 'ok', 200]);
 
             case($currentUser['role'] === 'admin'):
-                $user->update([
-                    'password' =>  Hash::make($data['password']),
-                    'name' => $data['name'],
-                    'last_name' => $data['last_name'],
-                    'second_name' => $data['second_name'],
-                    'role' => $data['role'],
-                ]);
+                    $user->password =  Hash::make($data['password']);
+                    $user->name = $data['name'];
+                    $user->last_name = $data['last_name'];
+                    $user->second_name = $data['second_name'];
+                    $user->role = $data['role'];
+                    $user->save();
                 return response(['message' => 'ok, admin', 200]);
 
         }

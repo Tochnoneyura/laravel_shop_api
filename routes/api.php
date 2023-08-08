@@ -53,7 +53,17 @@ Route::group([
 
 ], function ($router) {
 
-    Route::get('/',[UserController::class, 'show'])->name('api.users');
     Route::post('/update/{id}', [UserController::class, 'update'])->name('api.users.update');
     Route::post('/delete/{id}', [UserController::class, 'delete'])->name('api.users.delete');
+});
+
+
+Route::group([
+
+    'middleware' => 'auth.custom', 'jwt.auth',
+    'prefix' => 'users'
+
+], function ($router) {
+
+    Route::get('/',[UserController::class, 'index'])->name('api.users');
 });

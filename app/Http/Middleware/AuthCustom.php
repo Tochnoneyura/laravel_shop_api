@@ -17,8 +17,8 @@ class AuthCustom
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check()) {
-            return response()->json(['error' => 'This action is unauthorized'], 401);
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Admin check failed'], 401);
         }
         return $next($request);
     }
