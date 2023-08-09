@@ -24,15 +24,15 @@ class UpdateUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'password' => ['max:50', 'string'],
+            'password' => ['max:50', 'string', 'nullable'],
             'active' => ['in:Y,N,'],
-            'name' => ['max:50', 'string'],
-            'last_name' => ['max:50', 'string'],
+            'name' => ['max:50', 'string', 'nullable'],
+            'last_name' => ['max:50', 'string', 'nullable'],
             'second_name' => ['max:50', 'string', 'nullable'],
             'email' => ['max:255', 'email', 'unique:users,email'],
             'last_login' => ['date'],
             'deleted_at' => ['date'],
-            'role' => ['in:customer,admin'],
+            'role' => ['in:customer,admin', 'nullable'],
         ];
     }
 }

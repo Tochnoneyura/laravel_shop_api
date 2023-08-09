@@ -4,14 +4,16 @@ namespace App\Models;
 
 use App\Filters\QueryFilter;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Facade\Ignition\QueryRecorder\Query;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -61,5 +63,28 @@ class User extends Authenticatable implements JWTSubject
     public function scopeFilter(Builder $builder, QueryFilter $filter)
     {
         return $filter->apply($builder);
+    }
+
+    public function softDelete()
+    {
+        try{
+            DB::beginTransaction();
+                $this->active = 'N';
+                $this->save();
+                $this->delete();
+            DB::commit();    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+        return response(['message' => 'ok', 200]);
+    }
+
+    public function dataUpdate($data)
+    {
+        $this->password =  Hash::make($data['password']) ?? $this->password;
+        $this->name = $data['name']?? $this->name;
+        $this->last_name = $data['last_name'] ?? $this->last_name;
+        $this->second_name = $data['second_name'] ?? $this->second_name;
     }
 }

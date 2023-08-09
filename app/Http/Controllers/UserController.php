@@ -58,7 +58,7 @@ class UserController extends Controller
      public function update(UpdateUserRequest $request, $id)
     {   
         $user = User::findOrFail($id);
-        $currentUser =Auth::user();
+        $currentUser = Auth::user();
         $data = $request->all();
 
         switch(true) {
@@ -67,23 +67,29 @@ class UserController extends Controller
                 return response()->json(['error' => 'Admin check failed'], 401);
             
             case(((int) $id === $currentUser['id']) AND ($currentUser['role'] === 'customer')):
-                    $user->password =  Hash::make($data['password']) ?? $user->password;
-                    $user->name = $data['name']?? $user->name;
-                    $user->last_name = $data['last_name'] ?? $user->last_name;
-                    $user->second_name = $data['second_name'] ?? $user->second_name;
+                
+                try{
+
+                    $user->dataUpdate($data);
                     $user->save();
 
+                } catch (\Exception $e) {
+                    return response()->json(['message' => $e->getMessage()], 500);
+                }
                 return response(['message' => 'ok', 200]);
 
             case($currentUser['role'] === 'admin'):
-                    $user->password =  Hash::make($data['password']) ?? $user->password;
-                    $user->name = $data['name'] ?? $user->name;
-                    $user->last_name = $data['last_name'] ?? $user->last_name;
-                    $user->second_name = $data['second_name'] ?? $user->second_name;
+                try{
+
+                    $user->dataUpdate($data);
                     $user->role = $data['role'] ?? $user->role;
                     $user->save();
+                    
+                } catch (\Exception $e) {
+                    return response()->json(['message' => $e->getMessage()], 500);
+                }
                 return response(['message' => 'ok, admin', 200]);
-
+                
         }
     }
     
@@ -100,46 +106,17 @@ class UserController extends Controller
             
             case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer')):
     
-                try{
-                    DB::beginTransaction();
-                        $user->active = 'N';
-                        $user->save();
-                        $user->delete();
-                    DB::commit();    
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    return response()->json(['error' => $e->getMessage()], 500);
-                }
-                return response(['message' => 'ok', 200]);
-
+                $user->softDelete();
 
             case(((int) $id !== $currentUser['id']) AND ($currentUser['role'] === 'admin')):
                 
-                try{
-                    DB::beginTransaction();
-                        $user->active = 'N';
-                        $user->save();
-                        $user->delete();
-                    DB::commit();    
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    return response()->json(['error' => $e->getMessage()], 500);
-                }
+                $user->softDelete();
                 return response(['message' => 'ok, admin', 200]);
             
             
             case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num > 1)):
 
-                try{
-                    DB::beginTransaction();
-                        $user->active = 'N';
-                        $user->save();
-                        $user->delete();
-                    DB::commit();    
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    return response()->json(['error' => $e->getMessage()], 500);
-                }
+                $user->softDelete();
                 return response(['message' => 'ok, admin', 200]);
 
             case(((int) $id === $currentUser['id']) AND ($currentUser['role'] === 'admin') AND ($num <= 1)):
