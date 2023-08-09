@@ -28,4 +28,12 @@ class UserFilter extends QueryFilter
     {
         return $this->builder->where('created_at', '<=', $to);  
     }
+
+    public function search(string $search)
+    {
+        return $this->builder->where('name', 'LIKE', "%$search%")
+            ->orWhere('email', 'LIKE', "%$search%")
+            ->orWhere('last_name', 'LIKE', "%$search%")
+            ->orWhere('second_name', 'LIKE', "%$search%");
+    }
 }
