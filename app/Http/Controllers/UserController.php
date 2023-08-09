@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\UserFilter;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
@@ -9,17 +10,25 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\User as UserResource;
+
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(UserFilter $filters, Request $request)
     {
-        $user = Auth::user();
+        if($request->get('per_page') === 0) {
+            $per_page = User::count();
+        } else {
+            $per_page = $request->get('per_page') ?? 20;
+            }
 
-            $users = User::all();
-            dd($users);
 
-            return response(['message' => 'ok', 200]);
+        return User::withTrashed()
+        ->filter($filters)
+        ->OrderBy('users.id')
+        ->distinct('users.id')
+        ->paginate($per_page);
         
     }
 
@@ -77,44 +86,60 @@ class UserController extends Controller
 
         }
     }
-
+    
     public function delete($id)
     {
         $currentUser =Auth::user();
-        $num = DB::table('users')->where('role', '=', 'admin')->count();
+        $num = User::where('role', '=', 'admin')->count();
         $user = User::findOrFail($id);
 
         switch(true) {
 
-            case(((int) $id !== $currentUser['id']) AND ($currentUser['role'] !== 'admin')):
+            case(((int) $id !== $currentUser['id']) && ($currentUser['role'] !== 'admin')):
                 return response()->json(['error' => 'Admin check failed'], 401);
             
-            case(((int) $id === $currentUser['id']) AND ($currentUser['role'] === 'customer')):
+            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer')):
     
-                DB::transaction(function () use($user){
-                    $user->active = 'N';
-                    $user->delete();
-                });
+                try{
+                    DB::beginTransaction();
+                        $user->active = 'N';
+                        $user->save();
+                        $user->delete();
+                    DB::commit();    
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return response()->json(['error' => $e->getMessage()], 500);
+                }
                 return response(['message' => 'ok', 200]);
 
 
             case(((int) $id !== $currentUser['id']) AND ($currentUser['role'] === 'admin')):
                 
-                DB::transaction(function () use($user) {
-                    $user->active = 'N';
-                    $user->save();
-                    $user->delete();
-                });    
+                try{
+                    DB::beginTransaction();
+                        $user->active = 'N';
+                        $user->save();
+                        $user->delete();
+                    DB::commit();    
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return response()->json(['error' => $e->getMessage()], 500);
+                }
                 return response(['message' => 'ok, admin', 200]);
             
             
-            case(((int) $id === $currentUser['id']) AND ($currentUser['role'] === 'admin') AND ($num > 1)):
+            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num > 1)):
 
-                DB::transaction(function () use($user) {
-                    $user->active = 'N';
-                    $user->save();
-                    $user->delete();
-                });
+                try{
+                    DB::beginTransaction();
+                        $user->active = 'N';
+                        $user->save();
+                        $user->delete();
+                    DB::commit();    
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return response()->json(['error' => $e->getMessage()], 500);
+                }
                 return response(['message' => 'ok, admin', 200]);
 
             case(((int) $id === $currentUser['id']) AND ($currentUser['role'] === 'admin') AND ($num <= 1)):
