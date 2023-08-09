@@ -63,10 +63,10 @@ class UserController extends Controller
 
         switch(true) {
 
-            case(((int) $id !== $currentUser['id']) AND ($currentUser['role'] !== 'admin')):
+            case(((int) $id !== $currentUser['id']) && ($currentUser['role'] !== 'admin')):
                 return response()->json(['error' => 'Admin check failed'], 401);
             
-            case(((int) $id === $currentUser['id']) AND ($currentUser['role'] === 'customer')):
+            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer')):
                 
                 try{
 
@@ -108,7 +108,7 @@ class UserController extends Controller
     
                 $user->softDelete();
 
-            case(((int) $id !== $currentUser['id']) AND ($currentUser['role'] === 'admin')):
+            case(((int) $id !== $currentUser['id']) && ($currentUser['role'] === 'admin')):
                 
                 $user->softDelete();
                 return response(['message' => 'ok, admin', 200]);
@@ -119,7 +119,7 @@ class UserController extends Controller
                 $user->softDelete();
                 return response(['message' => 'ok, admin', 200]);
 
-            case(((int) $id === $currentUser['id']) AND ($currentUser['role'] === 'admin') AND ($num <= 1)):
+            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num <= 1)):
                 return response(['message' => 'You are the only admin', 401]);    
         }
     }
