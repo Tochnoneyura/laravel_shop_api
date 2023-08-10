@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NomenclatureController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\TableController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,4 +68,35 @@ Route::group([
 ], function ($router) {
 
     Route::get('/',[UserController::class, 'index'])->name('api.users');
+});
+
+
+Route::group([
+
+    'middleware' => 'auth.custom', 'jwt.auth',
+    'prefix' => 'tables'
+
+], function ($router) {
+
+    Route::post('/import/{table}',[TableController::class, 'import'])->name('api.tables.import');
+});
+
+Route::group([
+
+    'middleware' => 'jwt.auth',
+    'prefix' => 'products'
+
+], function ($router) {
+
+    Route::get('/',[NomenclatureController::class, 'index'])->name('api.products');
+});
+
+Route::group([
+
+    'middleware' => 'jwt.auth',
+    'prefix' => 'brands'
+
+], function ($router) {
+
+    Route::get('/',[BrandController::class, 'index'])->name('api.brands');
 });

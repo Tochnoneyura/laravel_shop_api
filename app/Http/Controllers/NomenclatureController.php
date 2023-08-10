@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\NomenclatureFilter;
 use App\Models\nomenclature;
 use Illuminate\Http\Request;
 
@@ -12,74 +13,21 @@ class NomenclatureController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(NomenclatureFilter $filters, Request $request)
     {
-        //
-    }
+        if($request->get('per_page') === 0) {
+            $per_page = Nomenclature::count();
+        } else {
+            $per_page = $request->get('per_page') ?? 20;
+            }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return Nomenclature::filter($filters)
+        ->OrderBy('nomenclature.guid')
+        ->distinct('nomenclature.guid')
+        ->paginate($per_page);
+        
+    
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\nomenclature  $nomenclature
-     * @return \Illuminate\Http\Response
-     */
-    public function show(nomenclature $nomenclature)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\nomenclature  $nomenclature
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(nomenclature $nomenclature)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\nomenclature  $nomenclature
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, nomenclature $nomenclature)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\nomenclature  $nomenclature
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(nomenclature $nomenclature)
-    {
-        //
-    }
+    
 }
