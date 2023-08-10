@@ -50,12 +50,12 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response(['message' => $e->getMessage()], 500);
         }
-        return response(['message' => 'ok', 200]);
+        return response(['message' => 'ok'], 200);
         
         
     }
 
-     public function update(UpdateUserRequest $request, $id)
+     public function update(UserRequest $request, $id)
     {   
         $user = User::findOrFail($id);
         $currentUser = Auth::user();
@@ -66,30 +66,14 @@ class UserController extends Controller
             case(((int) $id !== $currentUser['id']) && ($currentUser['role'] !== 'admin')):
                 return response()->json(['error' => 'Admin check failed'], 401);
             
-            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer')):
+            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer')
+                || ($currentUser['role'] === 'admin')):
                 
-                try{
-
-                    $user->dataUpdate($data);
-                    $user->save();
-
-                } catch (\Exception $e) {
-                    return response()->json(['message' => $e->getMessage()], 500);
-                }
-                return response(['message' => 'ok', 200]);
-
-            case($currentUser['role'] === 'admin'):
-                try{
-
-                    $user->dataUpdate($data);
-                    $user->role = $data['role'] ?? $user->role;
-                    $user->save();
+                
+                    $role = $currentUser['role'];
+                    $result = $user->dataUpdate($data, $role);
+                    return response($result);
                     
-                } catch (\Exception $e) {
-                    return response()->json(['message' => $e->getMessage()], 500);
-                }
-                return response(['message' => 'ok, admin', 200]);
-                
         }
     }
     
@@ -104,23 +88,16 @@ class UserController extends Controller
             case(((int) $id !== $currentUser['id']) && ($currentUser['role'] !== 'admin')):
                 return response()->json(['error' => 'Admin check failed'], 401);
             
-            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer')):
+            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer') 
+                || ((int) $id !== $currentUser['id']) && ($currentUser['role'] === 'admin') 
+                || ((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num > 1)):
     
-                $user->softDelete();
-
-            case(((int) $id !== $currentUser['id']) && ($currentUser['role'] === 'admin')):
+                $result = $user->softDelete();
+                return repsonse($result);
                 
-                $user->softDelete();
-                return response(['message' => 'ok, admin', 200]);
-            
-            
-            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num > 1)):
-
-                $user->softDelete();
-                return response(['message' => 'ok, admin', 200]);
 
             case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num <= 1)):
-                return response(['message' => 'You are the only admin', 401]);    
+                return response(['message' => 'You are the only admin'], 401);    
         }
     }
 }

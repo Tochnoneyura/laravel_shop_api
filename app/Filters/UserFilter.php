@@ -4,9 +4,10 @@ namespace App\Filters;
 
 class UserFilter extends QueryFilter
 {
-    public function is_active(string $active)
+    public function is_active($active)
     {
-        return $this->builder->where('active', $active);
+        $term = filter_var($active, FILTER_VALIDATE_BOOLEAN) ? 'IS NULL' : 'IS NOT NULL';
+        return $this->builder->whereRaw("users.deleted_at $term");
     }
 
     public function last_login_from($from)
@@ -16,7 +17,7 @@ class UserFilter extends QueryFilter
     
     public function last_login_to($to)
     {
-        return $this->builder->where('last_login_to', '<=', $to);  
+        return $this->builder->where('last_login', '<=', $to);  
     }
 
     public function register_at_from($from)

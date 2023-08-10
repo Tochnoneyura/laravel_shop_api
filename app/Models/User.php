@@ -77,14 +77,31 @@ class User extends Authenticatable implements JWTSubject
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
-        return response(['message' => 'ok', 200]);
+        return response(['message' => 'deleted', 200]);
     }
 
-    public function dataUpdate($data)
+    public function dataUpdate($data, $role)
     {
-        $this->password =  Hash::make($data['password']) ?? $this->password;
-        $this->name = $data['name']?? $this->name;
-        $this->last_name = $data['last_name'] ?? $this->last_name;
-        $this->second_name = $data['second_name'] ?? $this->second_name;
+        try {
+
+            if (isset($data['password'])) {
+                $this->password = Hash::make($data['password']);
+            } else {
+                $this->password;
+            }
+            $this->name = $data['name']?? $this->name;
+            $this->last_name = $data['last_name'] ?? $this->last_name;
+            
+            isset($data['name']) && empty($data['name']) ? null : ($data['name'] ?? $this->second_name);
+
+            if($role === 'admin') {
+                $this->role = $data['role'] ?? $this->role;
+            }
+            $this->save();
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+        return response(['message' => 'updated'], 200);
+        
     }
 }
