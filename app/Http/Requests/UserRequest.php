@@ -22,17 +22,41 @@ class UserRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {
-        return [
-            'password' => ['required', 'max:50', 'string'],
-            'active' => ['required', 'in:Y,N,'],
-            'name' => ['required', 'max:50', 'string'],
-            'last_name' => ['required', 'max:50', 'string'],
-            'second_name' => ['max:50', 'string', 'nullable'],
-            'email' => ['required', 'max:255', 'email', 'unique:users,email'],
-            'last_login' => ['date'],
-            'deleted_at' => ['date'],
-            'role' => ['required', 'in:customer,admin'],
-        ];
+    {   
+
+        $segments = array_map('strtolower', $this->segments());
+
+        $values = array('active' => ['in:Y,N,'],
+                        'second_name' => ['max:50', 'string', 'nullable'],
+                        'last_login' => ['date'],
+                        'deleted_at' => ['date'],
+         );
+
+        if(in_array('create', $segments)) {
+
+
+            $values['password'] = ['required', 'max:50', 'string'];
+            $values['name'] = ['required', 'max:50', 'string'];
+            $values['last_name'] = ['required', 'max:50', 'string'];  
+            $values['email'] = ['required', 'max:255', 'email', 'unique:users,email']; 
+            $values['role'] = ['in:customer,admin'];    
+                
+            return $values;
+        }
+        
+        if(in_array('update', $segments)) {
+
+
+            $values['password'] = ['max:50', 'string', 'nullable'];
+            $values['name'] = ['max:50', 'string', 'nullable'];
+            $values['last_name'] = ['max:50', 'string', 'nullable'];
+            $values['email'] = ['max:255', 'email', 'unique:users,email'];
+            $values['role'] =  ['in:customer,admin', 'nullable'];
+
+            return $values;
+        }
+
+        return [];
+        
     }
 }
