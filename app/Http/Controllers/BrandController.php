@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Filters\BrandFilter;
 use Illuminate\Http\Request;
 
 class BrandController extends Controller
@@ -16,10 +17,9 @@ class BrandController extends Controller
             }
 
 
-        return Brand::withTrashed()
-        ->filter($filters)
-        ->OrderBy('users.id')
-        ->distinct('users.id')
+        return Brand::filter($filters)
+        ->OrderBy('brands.guid')
+        ->distinct('brands.guid')
         ->paginate($per_page);
         
     }

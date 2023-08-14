@@ -3,9 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\NomenclatureController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\TableController;
+use App\Http\Controllers\BasketController;
+use App\Http\Controllers\NomenclatureController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,4 +101,15 @@ Route::group([
 ], function ($router) {
 
     Route::get('/',[BrandController::class, 'index'])->name('api.brands');
+});
+
+Route::group([
+
+    'middleware' => 'jwt.auth',
+    'prefix' => 'basket'
+
+], function ($router) {
+
+    Route::get('/',[BasketController::class, 'index'])->name('api.basket');
+    Route::post('/add',[BasketController::class, 'add'])->name('api.basket.add');
 });
