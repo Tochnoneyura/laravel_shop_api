@@ -5,12 +5,17 @@ namespace App\Filters;
 class NomenclatureFilter extends QueryFilter
 {
 
-    /*
-    public function brands($brands[])
+    public function brands($brands)
     {
-    return $this->builder->where();  
-    }
-    */
+        if(in_array("", $brands))
+        {
+            return response(['message' => 'there is empty value in array'], 400);
+        }
+
+        return $this->builder->wherein('brand_guid', $brands);
+
+    } 
+    
 
     public function search(string $search)
     {

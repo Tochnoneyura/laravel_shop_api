@@ -23,8 +23,8 @@ class NomenclatureController extends Controller
 
 
         return Nomenclature::filter($filters)
-        ->OrderBy('nomenclature.guid')
-        ->distinct('nomenclature.guid')
+        ->OrderBy('nomenclatures.guid')
+        ->distinct('nomenclatures.guid')
         ->paginate($per_page);
         
     

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Models\Document_status;
 use App\Models\Nomenclature;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -52,7 +53,7 @@ class TableController extends Controller
                              return response()->json(['error' => $validator->errors()->toJson(JSON_UNESCAPED_UNICODE)], 400);
                          }
                  }
-                 Document_status::upsert($objects, 'guid', 'name');
+                 Document_status::upsert($objects, 'guid', ['name']);
 
                 break;
                   

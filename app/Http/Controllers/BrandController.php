@@ -16,7 +16,7 @@ class BrandController extends Controller
             }
 
 
-        return User::withTrashed()
+        return Brand::withTrashed()
         ->filter($filters)
         ->OrderBy('users.id')
         ->distinct('users.id')
