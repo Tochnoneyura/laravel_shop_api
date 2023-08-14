@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Brand;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class nomenclature extends Model
+class Nomenclature extends Model
 {
     use HasFactory;
     
     protected $guarded = [];
+    
+    public function brand()
+    {
+      return $this->belongsTo(Brand::class);
+    }
 }

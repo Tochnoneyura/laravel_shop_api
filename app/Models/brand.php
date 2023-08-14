@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Nomenclature;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class brand extends Model
+class Brand extends Model
 {
     use HasFactory;
+    protected $guarded = [];
+
+    public function nomenclature()
+    {
+        return $this->hasMany(Nomenclature::class);
+    }
 }

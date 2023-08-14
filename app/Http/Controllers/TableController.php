@@ -2,41 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\Nomenclature;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
+use League\CommonMark\Node\Block\Document;
 
 class TableController extends Controller
 {
     public function import(Request $request, $table)
     {
-        $objects[] = json_decode($request, true);
+        $objects = $request->all();
 
         try {
             switch(true)
         {
-            case($table === 'nomenclatures'):
+            case($table === 'nomenclature'):
 
                 foreach($objects as $object) {
                     
-                    $validatedObject[] = $this->validate($object,
+                   $validator = Validator::make($object,
                         [
                             'guid' => ['required', 'max:36', 'string', 'unique:nomenclatures,guid'],
-                            'code' => ['required', 'max:1', 'string', 'unique:nomenclatures,code'],
+                            'code' => ['required', 'string', 'unique:nomenclatures,code'],
                             'name' => ['required', 'max:100', 'string'],
                             'full_name' => ['required', 'string'],
                             'set_number' => ['required', 'max:25', 'string'],
                             'brand_guid' => ['required', 'max:36', 'string'],
-                            'price' => ['required', 'numeric', 'min:0'],
+                            'price' => [/*'numeric',*/ 'min:0'],
                         ]);
+                        if($validator->fails()) {
+                            return response()->json(['error' => $validator->errors()->toJson(JSON_UNESCAPED_UNICODE)], 400);
+                        }
                 }
-
-                Nomenclature::upsert($validatedObject, 'guid', ['code', 'name', 'full_name', 'set_number', 'brand_guid', 'price']);
+                Nomenclature::upsert($objects, 'guid', ['code', 'name', 'full_name', 'set_number', 'brand_guid', 'price']);
                 break;
 
             case($table === 'document_statuses'):
+
+                foreach($objects as $object) {
+                    
+                    $validator = Validator::make($object,
+                         [
+                            'guid' => ['required', 'string', 'max:36', 'unique:document_statuses,guid'],
+                            'name' => ['required', 'string', 'max:50'],
+                         ]);
+                         if($validator->fails()) {
+                             return response()->json(['error' => $validator->errors()->toJson(JSON_UNESCAPED_UNICODE)], 400);
+                         }
+                 }
+                 Document_status::upsert($objects, 'guid', 'name');
+
                 break;
                   
             case($table === 'brands'):
+                foreach($objects as $object) {
+                    
+                    $validator = Validator::make($object,
+                         [
+                            'guid' => ['required', 'max:36', 'string', 'unique:brands,guid'],
+                            'name' => ['required', 'max:25', 'string', 'unique:brands,name'],
+                            'main_brand_guid' => ['max:36', 'string', 'nullable'],
+                         ]);
+                         if($validator->fails()) {
+                             return response()->json(['error' => $validator->errors()->toJson(JSON_UNESCAPED_UNICODE)], 400);
+                         }
+                 }
+                 Brand::upsert($objects, 'guid', ['name', 'main_brand_guid' ]);
+                
                 break;
         }
 
