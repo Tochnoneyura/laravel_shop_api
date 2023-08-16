@@ -14,7 +14,7 @@ class BrandController extends Controller
             $per_page = Brand::count();
         } else {
             $per_page = $request->get('per_page') ?? 20;
-            }
+        }
 
 
         return Brand::filter($filters)

@@ -21,7 +21,7 @@ class UserController extends Controller
             $per_page = User::count();
         } else {
             $per_page = $request->get('per_page') ?? 20;
-            }
+        }
 
 
         return User::withTrashed()

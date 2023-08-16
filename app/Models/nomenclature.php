@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Brand;
+use App\Models\Basket;
 use App\Filters\QueryFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -24,5 +25,10 @@ class Nomenclature extends Model
     public function scopeFilter(Builder $builder, QueryFilter $filter)
     {
         return $filter->apply($builder);
+    }
+
+    public function basket()
+    {
+      return $this->hasMany(Basket::class);
     }
 }

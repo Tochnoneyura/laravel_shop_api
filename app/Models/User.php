@@ -14,6 +14,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\Basket;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -103,5 +104,10 @@ class User extends Authenticatable implements JWTSubject
         }
         return response(['message' => 'updated'], 200);
         
+    }
+
+    public function basket()
+    {
+      return $this->hasMany(Basket::class);
     }
 }

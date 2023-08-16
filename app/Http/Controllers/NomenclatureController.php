@@ -19,7 +19,7 @@ class NomenclatureController extends Controller
             $per_page = Nomenclature::count();
         } else {
             $per_page = $request->get('per_page') ?? 20;
-            }
+        }
 
 
         return Nomenclature::filter($filters)
