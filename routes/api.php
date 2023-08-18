@@ -8,6 +8,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\BasketController;
+use App\Http\Controllers\DocumentStatusController;
 use App\Http\Controllers\NomenclatureController;
 
 /*
@@ -128,4 +129,14 @@ Route::group([
     Route::post('/submit',[OrderController::class, 'submit'])->name('api.orders.submit');
     Route::get('/{id}',[OrderController::class, 'show'])->name('api.orders.show');
     Route::post('/update/{id}',[OrderController::class, 'update'])->name('api.orders.update');
+});
+
+Route::group([
+
+    'middleware' => 'jwt.auth',
+    'prefix' => 'statuses'
+
+], function ($router) {
+
+    Route::get('/',[DocumentStatusController::class, 'index'])->name('api.statuses');
 });

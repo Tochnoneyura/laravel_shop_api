@@ -7,10 +7,12 @@ class NomenclatureFilter extends QueryFilter
 
     public function brands($brands)
     {
-        if(in_array("", $brands))
-        {
-            return response(['message' => 'there is empty value in array'], 400);
-        }
+        $brands = array_filter($brands);
+
+        if(empty($brands))
+         {
+             return response(['message' => 'invalid data'], 400);
+         }
 
         return $this->builder->wherein('brand_guid', $brands);
 

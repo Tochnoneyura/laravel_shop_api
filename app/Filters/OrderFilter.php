@@ -12,19 +12,24 @@ class OrderFilter extends QueryFilter
 
     public function statuses($statuses)
     {
-        if(in_array("", $statuses))
+        $statuses = array_filter($statuses);
+
+        if(empty($statuses))
         {
-            return response(['message' => 'there is empty value in array'], 400);
+            return response(['message' => 'invalid data'], 400);
         }
+      
 
         return $this->builder->wherein('status', $statuses);
     }
 
     public function payment_statuses($paymentStatuses)
     {
-        if(in_array("", $paymentStatuses))
+        $paymentStatuses = array_filter($paymentStatuses);
+
+        if(empty($paymentStatuses))
         {
-            return response(['message' => 'there is empty value in array'], 400);
+            return response(['message' => 'invalid data'], 400);
         }
 
         return $this->builder->wherein('payment_status', $paymentStatuses);
@@ -32,29 +37,25 @@ class OrderFilter extends QueryFilter
 
     public function users($users)
     {
+        $users = array_filter($users);
 
-        // ТУТ БУДЕТ ПРОВЕРКА РОЛИ
-
-
-        if(in_array("", $users))
+        if(empty($users))
         {
-            return response(['message' => 'there is empty value in array'], 400);
+             return response(['message' => 'invalid data'], 400);
         }
 
         return $this->builder->wherein('created_by', $users);
     }
     
-
-    public function search(string $search)
+    public function latest_update_by_client($order_by)
     {
-        return $this->builder->where(function($query) use ($search){
 
-            $query->where('code', 'ILIKE', "{%$search%}")
-                ->orWhere('name', 'ILIKE', "{%$search%}")
-                ->orWhere('full_name', 'ILIKE', "{%$search%}")
-                ->orWhere('set_number', 'ILIKE', "{%$search%}");
+        $order_by = strtolower($order_by);
+        if(($order_by === 'asc') || ($order_by === 'desc'))
+        {
+            return $this->builder->Orderby('updated_at', $order_by);
+        }
 
-        });
-        
+        return response(['message' => 'invalid data'], 400);
     }
 }

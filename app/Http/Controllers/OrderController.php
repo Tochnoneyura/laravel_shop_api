@@ -17,7 +17,7 @@ class OrderController extends Controller
     {
 
         if($request->get('per_page') === 0) {
-            $per_page = User::count();
+            $per_page = Order::count();
         } else {
             $per_page = $request->get('per_page') ?? 20;
         }
@@ -27,6 +27,9 @@ class OrderController extends Controller
         switch(true)
         {
             case($currentUser['role'] === 'customer'):
+
+                $request->remove('users');
+
                 return Order::where('orders.created_by', '=', $currentUser['id'])
                 ->filter($filters)
                 ->OrderBy('orders.date')
@@ -47,13 +50,17 @@ class OrderController extends Controller
 
         
 
-        if(($currentUser['role'] === 'customer') && ($currentUser['id'] !== $order['created_by']))
-        {
+        if(($currentUser['role'] === 'customer') && ($currentUser['id'] !== $order['created_by'])){
+        
             return response()->json(['error' => 'Admin check failed'], 401);
         }
         
         return Order::where('orders.id', '=', $id)
-        //->join('order_items', 'orders.id', '=', 'order_items.order_id')
+        ->with(['order_item' => function ($query) {
+            $query->join('nomenclatures', 'order_items.nomenclature_guid', '=', 'nomenclatures.guid')
+            ->join('brands', 'nomenclatures.brand_guid', '=', 'brands.guid')
+            ->select('order_items.*', 'nomenclatures.code', 'nomenclatures.name', 'nomenclatures.full_name', 'nomenclatures.set_number', 'brands.guid as brand_guid', 'brands.name as brand_name');
+        }])
         ->first();
     }
 
@@ -65,7 +72,7 @@ class OrderController extends Controller
         try {
 
          $order =  Order::create([
-                'date' => now(),
+                'date' => $data['date'],
                 'is_processed' => false,
                 'total' => 0,
                 'payment_status' => 'НеОплачен',
@@ -126,7 +133,7 @@ class OrderController extends Controller
         return response(['message' => 'ok'], 200);
     }
 
-    public function update(OrderRequest $request, $id) //пока не работает, надо менять реквест
+    public function update(OrderRequest $request, $id)
     {
         $data = $request->all();
         $currentUser = Auth::user();
@@ -140,19 +147,20 @@ class OrderController extends Controller
 
                     return response()->json(['error' => 'Admin check failed'], 401);
 
-                    case(($currentUser['role'] === 'customer') && ($currentUser['id'] === $order['created_by'])):
+                case(($currentUser['role'] === 'customer') && ($currentUser['id'] === $order['created_by'])):
 
-                        $order->website_comment = $data['website_comment'];
-                        $order->save();
-                        break;
+                    $order->website_comment = $data['website_comment'];
+                    $order->updated_at = now();
+                    $order->save();
+                    break;
 
-                        case(($currentUser['role'] === 'admin') && ($currentUser['id'] === $order['created_by'])):
+                case(($currentUser['role'] === 'admin') && ($currentUser['id'] === $order['created_by'])):
 
-                            $order->status = $data['status'] ?? $order->status;
-                            $order->payment_status = $data['payment_status'] ?? $order->payment_status;
-                            $order->website_comment_for_client = $data['website_comment_for_client'] ?? $order->website_comment_for_client;
-                            $order->save();
-                            break;
+                    $order->status = $data['status'] ?? $order->status;
+                    $order->payment_status = $data['payment_status'] ?? $order->payment_status;
+                    $order->website_comment_for_client = $data['website_comment_for_client'] ?? $order->website_comment_for_client;
+                    $order->save();
+                    break;
 
             }
         }  catch (\Exception $e) {
