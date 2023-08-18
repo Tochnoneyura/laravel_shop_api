@@ -26,7 +26,7 @@ class OrderRequest extends FormRequest
         return [
 
             'delivery_method' => ['required', 'in:Самовывоз,ДоКлиента,ДоПеревозчикаДоставкаКлиенту,ДоПеревозчикаДоставкаДоТерминала,Филиал,Закупка,ВИПКлиент'],
-            'delivery_date' => ['nullable', 'date'],
+            //'delivery_date' => ['nullable', 'date'],
             'delivery_address' => ['required', 'string'],
             'delivery_company' => ['required', 'string'],
             'contact_name' => ['required', 'string'],
@@ -34,6 +34,7 @@ class OrderRequest extends FormRequest
             'website_comment' => ['nullable', 'string'],
             'website_comment_for_client' => ['nullable', 'string'],
             'is_delivery_today' => ['required', 'boolean'],
+            'payment_type' => ['required', 'in:Наличная,Безналичная,ПлатежнаяКарта,Взаимозачет']
 
         ];
     }

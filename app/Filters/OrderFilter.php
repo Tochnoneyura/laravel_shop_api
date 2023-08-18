@@ -5,16 +5,44 @@ namespace App\Filters;
 class OrderFilter extends QueryFilter
 {
 
-    public function brands($brands)
+    public function is_processed($processed)
     {
-        if(in_array("", $brands))
+        return $this->builder->where('is_processed', '=', $processed);
+    }
+
+    public function statuses($statuses)
+    {
+        if(in_array("", $statuses))
         {
             return response(['message' => 'there is empty value in array'], 400);
         }
 
-        return $this->builder->wherein('brand_guid', $brands);
+        return $this->builder->wherein('status', $statuses);
+    }
 
-    } 
+    public function payment_statuses($paymentStatuses)
+    {
+        if(in_array("", $paymentStatuses))
+        {
+            return response(['message' => 'there is empty value in array'], 400);
+        }
+
+        return $this->builder->wherein('payment_status', $paymentStatuses);
+    }
+
+    public function users($users)
+    {
+
+        // ТУТ БУДЕТ ПРОВЕРКА РОЛИ
+
+
+        if(in_array("", $users))
+        {
+            return response(['message' => 'there is empty value in array'], 400);
+        }
+
+        return $this->builder->wherein('created_by', $users);
+    }
     
 
     public function search(string $search)

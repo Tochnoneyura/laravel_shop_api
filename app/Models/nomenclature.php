@@ -31,4 +31,5 @@ class Nomenclature extends Model
     {
       return $this->hasMany(Basket::class);
     }
+
 }

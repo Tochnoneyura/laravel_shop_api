@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Order_item;
+use App\Filters\QueryFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 class Order extends Model
 {
@@ -18,5 +20,9 @@ class Order extends Model
       return $this->hasMany(Order_item::class);
     }
 
+    public function scopeFilter(Builder $builder, QueryFilter $filter)
+    {
+        return $filter->apply($builder);
+    }
     
 }

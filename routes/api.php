@@ -126,4 +126,6 @@ Route::group([
 
     Route::get('/',[OrderController::class, 'index'])->name('api.orders');
     Route::post('/submit',[OrderController::class, 'submit'])->name('api.orders.submit');
+    Route::get('/{id}',[OrderController::class, 'show'])->name('api.orders.show');
+    Route::post('/update/{id}',[OrderController::class, 'update'])->name('api.orders.update');
 });

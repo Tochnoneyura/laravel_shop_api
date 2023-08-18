@@ -93,7 +93,7 @@ class UserController extends Controller
                 || ((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num > 1)):
     
                 $result = $user->softDelete();
-                return repsonse($result);
+                return response($result);
                 
 
             case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num <= 1)):
