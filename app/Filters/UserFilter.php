@@ -34,10 +34,10 @@ class UserFilter extends QueryFilter
     {
         return $this->builder->where(function($query) use ($search){
 
-            $query->where('name', 'ILIKE', "{%$search%}")
-                ->orWhere('email', 'ILIKE', "{%$search%}")
-                ->orWhere('last_name', 'ILIKE', "{%$search%}")
-                ->orWhere('second_name', 'ILIKE', "{%$search%}");
+            $query->where('name', 'ILIKE', "%{$search}%")
+                ->orWhere('email', 'ILIKE', "%{$search}%")
+                ->orWhere('last_name', 'ILIKE', "%{$search}%")
+                ->orWhere('second_name', 'ILIKE', "%{$search}%");
 
         });
         

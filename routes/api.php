@@ -66,7 +66,7 @@ Route::group([
 
 Route::group([
 
-    'middleware' => 'auth.custom', 'jwt.auth',
+    'middleware' => ['jwt.auth', 'auth.custom'], 
     'prefix' => 'users'
 
 ], function ($router) {
@@ -77,7 +77,7 @@ Route::group([
 
 Route::group([
 
-    'middleware' => 'auth.custom', 'jwt.auth',
+    'middleware' => ['jwt.auth', 'auth.custom'],
     'prefix' => 'tables'
 
 ], function ($router) {

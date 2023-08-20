@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Document_status;
+use App\Models\DocumentStatus;
 
 class DocumentStatusController extends Controller
 {
@@ -11,11 +11,11 @@ class DocumentStatusController extends Controller
     {
 
         if($request->get('per_page') === 0) {
-            $per_page = Order::count();
+            $per_page = DocumentStatus::count();
         } else {
             $per_page = $request->get('per_page') ?? 20;
         }
 
-        return Document_status::paginate($per_page);
+        return DocumentStatus::paginate($per_page);
     }
 }

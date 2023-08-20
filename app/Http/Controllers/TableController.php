@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
-use App\Models\Document_status;
+use App\Models\DocumentStatus;
 use App\Models\Nomenclature;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
-use League\CommonMark\Node\Block\Document;
 
 class TableController extends Controller
 {
@@ -31,7 +30,7 @@ class TableController extends Controller
                             'full_name' => ['required', 'string'],
                             'set_number' => ['required', 'max:25', 'string'],
                             'brand_guid' => ['required', 'max:36', 'string'],
-                            'price' => [/*'numeric',*/ 'min:0'],
+                            'price' => ['numeric', 'min:0', 'nullable'],
                         ]);
                         if($validator->fails()) {
                             return response()->json(['error' => $validator->errors()->toJson(JSON_UNESCAPED_UNICODE)], 400);
@@ -40,7 +39,7 @@ class TableController extends Controller
                 Nomenclature::upsert($objects, 'guid', ['code', 'name', 'full_name', 'set_number', 'brand_guid', 'price']);
                 break;
 
-            case($table === 'document_statuses'):
+            case(($table === 'document_statuses') || ($table === 'document-statuses')):
 
                 foreach($objects as $object) {
                     
@@ -53,7 +52,7 @@ class TableController extends Controller
                              return response()->json(['error' => $validator->errors()->toJson(JSON_UNESCAPED_UNICODE)], 400);
                          }
                  }
-                 Document_status::upsert($objects, 'guid', ['name']);
+                 DocumentStatus::upsert($objects, 'guid', ['name']);
 
                 break;
                   
@@ -73,6 +72,9 @@ class TableController extends Controller
                  Brand::upsert($objects, 'guid', ['name', 'main_brand_guid' ]);
                 
                 break;
+            
+            default: 
+                return response(['message' => 'invalid data'], 400); 
         }
 
         } catch (\Exception $e) {

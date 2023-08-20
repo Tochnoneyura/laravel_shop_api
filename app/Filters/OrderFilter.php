@@ -5,9 +5,10 @@ namespace App\Filters;
 class OrderFilter extends QueryFilter
 {
 
-    public function is_processed($processed)
+    public function is_processed($is_processed)
     {
-        return $this->builder->where('is_processed', '=', $processed);
+        filter_var($is_processed, FILTER_VALIDATE_BOOLEAN);
+        return $this->builder->where('is_processed', '=', $is_processed);
     }
 
     public function statuses($statuses)
@@ -16,11 +17,11 @@ class OrderFilter extends QueryFilter
 
         if(empty($statuses))
         {
-            return response(['message' => 'invalid data'], 400);
+            return $this->builder;
         }
       
 
-        return $this->builder->wherein('status', $statuses);
+        return $this->builder->whereIn('status', $statuses);
     }
 
     public function payment_statuses($paymentStatuses)
@@ -29,10 +30,10 @@ class OrderFilter extends QueryFilter
 
         if(empty($paymentStatuses))
         {
-            return response(['message' => 'invalid data'], 400);
+            return $this->builder;
         }
 
-        return $this->builder->wherein('payment_status', $paymentStatuses);
+        return $this->builder->whereIn('payment_status', $paymentStatuses);
     }
 
     public function users($users)
@@ -41,10 +42,10 @@ class OrderFilter extends QueryFilter
 
         if(empty($users))
         {
-             return response(['message' => 'invalid data'], 400);
+            return $this->builder;
         }
 
-        return $this->builder->wherein('created_by', $users);
+        return $this->builder->whereIn('created_by', $users);
     }
     
     public function latest_update_by_client($order_by)
@@ -53,9 +54,9 @@ class OrderFilter extends QueryFilter
         $order_by = strtolower($order_by);
         if(($order_by === 'asc') || ($order_by === 'desc'))
         {
-            return $this->builder->Orderby('updated_at', $order_by);
+            return $this->builder->orderby('updated_at', $order_by);
         }
 
-        return response(['message' => 'invalid data'], 400);
+        return $this->builder;
     }
 }

@@ -18,7 +18,7 @@ class BrandController extends Controller
 
 
         return Brand::filter($filters)
-        ->OrderBy('brands.guid')
+        ->orderBy('brands.guid')
         ->distinct('brands.guid')
         ->paginate($per_page);
         

@@ -6,11 +6,8 @@ use App\Filters\UserFilter;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\UpdateUserRequest;
-use App\Http\Resources\User as UserResource;
 
 
 class UserController extends Controller
@@ -26,7 +23,7 @@ class UserController extends Controller
 
         return User::withTrashed()
         ->filter($filters)
-        ->OrderBy('users.id')
+        ->orderBy('users.id')
         ->distinct('users.id')
         ->paginate($per_page);
         
@@ -44,7 +41,7 @@ class UserController extends Controller
                 'active' => 'Y',
                 'last_name' => $data['last_name'],
                 'second_name' => $data['second_name'],
-                'role' => 'admin',
+                'role' => 'customer',
                 'last_login' => now(),
             ]);
         } catch (\Exception $e) {

@@ -6,7 +6,6 @@ use App\Http\Requests\BasketRequest;
 use App\Models\Basket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 
 class BasketController extends Controller
@@ -24,7 +23,7 @@ class BasketController extends Controller
         return Basket::where('created_by', '=', $currentUser['id'])
         ->join('nomenclatures', 'nomenclatures.guid', '=', 'baskets.nomenclature_guid')
         ->join('brands', 'brands.guid', '=', 'nomenclatures.brand_guid')
-        ->select('nomenclatures.guid as nomenclature_guid', 'nomenclatures.full_name', 'nomenclatures.set_number', 'nomenclatures.price', 'brands.name', 'brands.guid as brand_guid', 'baskets.amount')
+        ->select('nomenclatures.guid as nomenclature_guid', 'nomenclatures.full_name', 'nomenclatures.set_number', 'nomenclatures.price', 'brands.name as brand_name', 'brands.guid as brand_guid', 'brands.main_brand_guid', 'baskets.amount')
         ->paginate($per_page);
         
     }
@@ -32,10 +31,10 @@ class BasketController extends Controller
     public function add(BasketRequest $request)
     {
         $currentUser = Auth::user();
-        $rawobjects = $request->all();
+        $rawObjects = $request->all();
         
         try {
-            foreach($rawobjects as $objects) {
+            foreach($rawObjects as $objects) {
 
                     foreach($objects as &$object) {
                         
@@ -56,11 +55,11 @@ class BasketController extends Controller
     {
         $currentUser = Auth::user();
 
-        $rawobjects = $request->all();
+        $rawObjects = $request->all();
 
         try {
 
-        foreach($rawobjects as $objects)
+        foreach($rawObjects as $objects)
         {
             foreach($objects as $object)
             {

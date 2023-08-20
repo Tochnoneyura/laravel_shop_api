@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Basket;
-use App\Models\Order_item;
+use App\Models\OrderItem;
 use App\Filters\OrderFilter;
 use App\Models\Nomenclature;
 use Illuminate\Http\Request;
@@ -32,12 +32,12 @@ class OrderController extends Controller
 
                 return Order::where('orders.created_by', '=', $currentUser['id'])
                 ->filter($filters)
-                ->OrderBy('orders.date')
+                ->orderBy('orders.date')
                 ->paginate($per_page);
             
             case($currentUser['role'] === 'admin'):
                 return Order::filter($filters)
-                ->OrderBy('orders.date')
+                ->orderBy('orders.date')
                 ->paginate($per_page);
         }
     }
@@ -101,7 +101,7 @@ class OrderController extends Controller
                 
 
 
-                Order_item::create([
+                OrderItem::create([
 
                     'order_id' => $order['id'],
                     'amount' => $basket->amount,
@@ -113,7 +113,7 @@ class OrderController extends Controller
             }
             
 
-            $orderItems = Order_item::where('order_id', '=', $order['id'])->get();
+            $orderItems = OrderItem::where('order_id', '=', $order['id'])->get();
             $total = 0;
             
 
