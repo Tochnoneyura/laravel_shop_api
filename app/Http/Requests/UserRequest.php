@@ -22,9 +22,16 @@ class UserRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {   
-
-        $segments = array_map('strtolower', $this->segments());
+    {
+        if ($this->routeIs('api.auth.register')) {
+            return [
+                'password' => ['required', 'max:50', 'string'],
+                'name' => ['required', 'max:50', 'string'],
+                'last_name' => ['required', 'max:50', 'string'],
+                'second_name' => ['nullable', 'max:50', 'string'],
+                'email' => ['required', 'max:255', 'email', 'unique:users,email'],
+            ];
+        }
 
         $values = array('active' => ['in:Y,N,'],
                         'second_name' => ['max:50', 'string', 'nullable'],
@@ -32,19 +39,7 @@ class UserRequest extends FormRequest
                         'deleted_at' => ['date'],
          );
 
-        if(in_array('create', $segments)) {
-
-
-            $values['password'] = ['required', 'max:50', 'string'];
-            $values['name'] = ['required', 'max:50', 'string'];
-            $values['last_name'] = ['required', 'max:50', 'string'];  
-            $values['email'] = ['required', 'max:255', 'email', 'unique:users,email']; 
-            $values['role'] = ['in:customer,admin'];    
-                
-            return $values;
-        }
-        
-        if(in_array('update', $segments)) {
+        if ($this->routeIs('api.users.update')) {
 
 
             $values['password'] = ['max:50', 'string', 'nullable'];

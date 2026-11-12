@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Filters\QueryFilter;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Facade\Ignition\QueryRecorder\Query;
@@ -66,19 +65,11 @@ class User extends Authenticatable implements JWTSubject
         return $filter->apply($builder);
     }
 
-    public function softDelete()
+    public function softDelete(): void
     {
-        try{
-            DB::beginTransaction();
-                $this->active = 'N';
-                $this->save();
-                $this->delete();
-            DB::commit();    
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-        return response(['message' => 'deleted', 200]);
+        $this->active = 'N';
+        $this->save();
+        $this->delete();
     }
 
     public function dataUpdate($data, $role)

@@ -16,7 +16,7 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->boolean('is_processed')->default('false');
+            $table->boolean('is_processed')->default(false);
             $table->float('total', 15, 2)->nullable();
             $table->string('payment_status')->default('НеОплачен');
             $table->string('status', 36)->references('guid')->on('document_statuses')->default('4454a860-1b1e-4020-83c4-beaede97e3ec');

@@ -10,8 +10,8 @@ class BrandFilter extends QueryFilter
     {
         return $this->builder->where(function($query) use ($search){
 
-            $query->where('guid', 'ILIKE', "{%$search%}")
-                ->orWhere('name', 'ILIKE', "{%$search%}");
+            $query->where('guid', 'ILIKE', "%{$search}%")
+                ->orWhere('name', 'ILIKE', "%{$search}%");
 
         });
         

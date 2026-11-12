@@ -3,22 +3,21 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use illuminate\Http\Request;
-use illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class AuthCustom
 {
     /**
      * Handle an incoming request.
      * 
-     * @param \illuminate\Http\Request $request
+     * @param \Illuminate\Http\Request $request
      * @param \Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->user()->role !== 'admin') {
-            return response()->json(['error' => 'Admin check failed'], 401);
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['error' => 'Admin check failed'], 403);
         }
         return $next($request);
     }

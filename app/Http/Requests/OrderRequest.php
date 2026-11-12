@@ -26,14 +26,16 @@ class OrderRequest extends FormRequest
         return [
 
             'delivery_method' => ['required', 'in:Самовывоз,ДоКлиента,ДоПеревозчикаДоставкаКлиенту,ДоПеревозчикаДоставкаДоТерминала,Филиал,Закупка,ВИПКлиент'],
-            'delivery_date' => ['nullable', 'date'],
-            'delivery_address' => ['required', 'string'],
-            'delivery_company' => ['required', 'string'],
-            'contact_name' => ['required', 'string'],
+            'delivery_date' => ['nullable', 'date_format:Y-m-d'],
+            'delivery_address' => ['required', 'string', 'max:255'],
+            'delivery_company' => ['required', 'string', 'max:255'],
+            'contact_name' => ['required', 'string', 'max:255'],
             'contact_phone' => ['required', 'string', 'max:255'],
-            'website_comment' => ['nullable', 'string'],
+            'website_comment' => ['nullable', 'string', 'max:255'],
             'website_comment_for_client' => ['nullable', 'string'],
             'is_delivery_today' => ['required', 'boolean'],
+            'products' => ['required', 'array', 'min:1', 'max:100'],
+            'products.*' => ['required', 'string', 'max:36', 'distinct'],
 
         ];
     }

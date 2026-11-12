@@ -21,10 +21,10 @@ class NomenclatureFilter extends QueryFilter
     {
         return $this->builder->where(function($query) use ($search){
 
-            $query->where('code', 'ILIKE', "{%$search%}")
-                ->orWhere('name', 'ILIKE', "{%$search%}")
-                ->orWhere('full_name', 'ILIKE', "{%$search%}")
-                ->orWhere('set_number', 'ILIKE', "{%$search%}");
+            $query->where('code', 'ILIKE', "%{$search}%")
+                ->orWhere('name', 'ILIKE', "%{$search}%")
+                ->orWhere('full_name', 'ILIKE', "%{$search}%")
+                ->orWhere('set_number', 'ILIKE', "%{$search}%");
 
         });
         

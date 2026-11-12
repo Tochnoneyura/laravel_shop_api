@@ -25,8 +25,8 @@ class BasketRequest extends FormRequest
     {
         return [
             'basket' => ['array', 'required'],
-            'basket.*.nomenclature_guid' => ['required', 'exists:nomenclatures,guid'],
-            'basket.*.amount' => ['required', 'numeric']
+            'basket.*.nomenclature_guid' => ['required', 'string', 'distinct', 'exists:nomenclatures,guid'],
+            'basket.*.amount' => ['required', 'numeric', 'min:0.001', 'max:999999999999.999']
         ];
     }
 }
