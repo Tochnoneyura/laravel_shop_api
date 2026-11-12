@@ -7,10 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\UpdateUserRequest;
-use App\Http\Resources\User as UserResource;
+use Illuminate\Support\Collection;
 
 
 class UserController extends Controller
@@ -34,70 +32,69 @@ class UserController extends Controller
 
     public function create(UserRequest $request)
     {
-        $data = $request->all();
+        $data = $request->validated();
 
-        try {
-            User::create([
-                'email' => $data['email'],
-                'name' => $data['name'],
-                'password' => Hash::make($data['password']),
-                'active' => 'Y',
-                'last_name' => $data['last_name'],
-                'second_name' => $data['second_name'],
-                'role' => 'admin',
-                'last_login' => now(),
-            ]);
-        } catch (\Exception $e) {
-            return response(['message' => $e->getMessage()], 500);
-        }
+        User::create([
+            'email' => $data['email'],
+            'name' => $data['name'],
+            'password' => Hash::make($data['password']),
+            'active' => 'Y',
+            'last_name' => $data['last_name'],
+            'second_name' => $data['second_name'] ?? null,
+            'role' => 'customer',
+            'last_login' => now(),
+        ]);
+
         return response(['message' => 'ok'], 200);
-        
-        
     }
 
-     public function update(UserRequest $request, $id)
-    {   
-        $user = User::findOrFail($id);
-        $currentUser = Auth::user();
-        $data = $request->all();
-
-        switch(true) {
-
-            case(((int) $id !== $currentUser['id']) && ($currentUser['role'] !== 'admin')):
-                return response()->json(['error' => 'Admin check failed'], 401);
-            
-            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer')
-                || ($currentUser['role'] === 'admin')):
-                
-                
-                    $role = $currentUser['role'];
-                    $result = $user->dataUpdate($data, $role);
-                    return response($result);
-                    
-        }
-    }
-    
-    public function delete($id)
+    public function update(UserRequest $request, $id)
     {
-        $currentUser =Auth::user();
-        $num = User::where('role', '=', 'admin')->count();
-        $user = User::findOrFail($id);
+        $currentUser = $request->user();
+        $data = $request->validated();
 
-        switch(true) {
+        return DB::transaction(function () use ($id, $currentUser, $data) {
+            $admins = isset($data['role']) ? $this->lockAdminIds() : null;
+            $isAdmin = $admins ? $admins->contains($currentUser->id) : $currentUser->role === 'admin';
 
-            case(((int) $id !== $currentUser['id']) && ($currentUser['role'] !== 'admin')):
-                return response()->json(['error' => 'Admin check failed'], 401);
-            
-            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'customer') 
-                || ((int) $id !== $currentUser['id']) && ($currentUser['role'] === 'admin') 
-                || ((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num > 1)):
-    
-                $result = $user->softDelete();
-                return repsonse($result);
-                
+            if ((int) $id !== $currentUser->id && ! $isAdmin) {
+                return response()->json(['error' => 'Admin check failed'], 403);
+            }
 
-            case(((int) $id === $currentUser['id']) && ($currentUser['role'] === 'admin') && ($num <= 1)):
-                return response(['message' => 'You are the only admin'], 401);    
-        }
+            $user = User::lockForUpdate()->findOrFail($id);
+
+            if ($isAdmin && ($data['role'] ?? null) === 'customer'
+                && $user->role === 'admin' && $admins->count() === 1) {
+                return response()->json(['message' => 'You are the only admin'], 409);
+            }
+
+            return $user->dataUpdate($data, $isAdmin ? 'admin' : 'customer');
+        });
+    }
+
+    public function delete(Request $request, $id)
+    {
+        return DB::transaction(function () use ($request, $id) {
+            $admins = $this->lockAdminIds();
+            $currentUserId = $request->user()->id;
+
+            if ((int) $id !== $currentUserId && ! $admins->contains($currentUserId)) {
+                return response()->json(['error' => 'Admin check failed'], 403);
+            }
+
+            $user = User::lockForUpdate()->findOrFail($id);
+            if ($user->role === 'admin' && $admins->count() === 1) {
+                return response()->json(['message' => 'You are the only admin'], 409);
+            }
+
+            $user->softDelete();
+
+            return response()->json(['message' => 'deleted']);
+        });
+    }
+
+    private function lockAdminIds(): Collection
+    {
+        return User::where('role', 'admin')->orderBy('id')->lockForUpdate()->pluck('id');
     }
 }

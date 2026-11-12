@@ -16,6 +16,9 @@ class Nomenclature extends Model
     protected $guarded = [];
 
     protected $primaryKey = 'guid';
+    protected $keyType = 'string';
+    public $incrementing = false;
+    protected $casts = ['price' => 'float'];
     
     public function brand()
     {

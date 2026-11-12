@@ -6,7 +6,6 @@ use App\Http\Requests\BasketRequest;
 use App\Models\Basket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 
 class BasketController extends Controller
@@ -25,30 +24,25 @@ class BasketController extends Controller
         ->join('nomenclatures', 'nomenclatures.guid', '=', 'baskets.nomenclature_guid')
         ->join('brands', 'brands.guid', '=', 'nomenclatures.brand_guid')
         ->select('nomenclatures.guid as nomenclature_guid', 'nomenclatures.full_name', 'nomenclatures.set_number', 'nomenclatures.price', 'brands.name', 'brands.guid as brand_guid', 'baskets.amount')
+        ->withCasts(['amount' => 'float', 'price' => 'float'])
         ->paginate($per_page);
         
     }
 
     public function add(BasketRequest $request)
     {
-        $currentUser = Auth::user();
-        $rawobjects = $request->all();
-        
-        try {
-            foreach($rawobjects as $objects) {
-
-                    foreach($objects as &$object) {
-                        
-                        $object['created_by'] = $currentUser['id'];
-                    }
-                    
-             }
-             Basket::upsert($objects, ['nomenclature_guid', 'created_by'], ['amount']);
-             
-
-        } catch (\Exception $e) {
-            return response(['message' => $e->getMessage()], 500);
+        $userId = $request->user()->id;
+        $rows = [];
+        foreach ($request->validated()['basket'] as $item) {
+            $rows[] = [
+                'nomenclature_guid' => $item['nomenclature_guid'],
+                'amount' => $item['amount'],
+                'created_by' => $userId,
+            ];
         }
+
+        Basket::upsert($rows, ['nomenclature_guid', 'created_by'], ['amount']);
+
         return response(['message' => 'ok'], 200);
     }
 

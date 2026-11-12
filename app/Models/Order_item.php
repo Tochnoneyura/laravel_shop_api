@@ -11,6 +11,7 @@ class Order_item extends Model
     use HasFactory;
     
     protected $guarded = [];
+    public $incrementing = false;
 
     public function order()
     {

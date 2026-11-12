@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Filters\NomenclatureFilter;
-use App\Models\nomenclature;
+use App\Models\Nomenclature;
 use Illuminate\Http\Request;
 
 class NomenclatureController extends Controller
